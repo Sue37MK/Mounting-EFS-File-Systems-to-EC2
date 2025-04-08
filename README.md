@@ -1,123 +1,139 @@
-
-```markdown
-# Mounting EFS File Systems to EC2 Instances Across Availability Zones
-
-This project demonstrates how to mount an Amazon Elastic File System (EFS) to two EC2 instances located in different Availability Zones (AZs) within the same region. It ensures shared file access between the EC2 instances using EFS.
-
-## Architecture Overview
-
-- **EFS File System**: Shared storage across EC2 instances
-- **EC2 Instances**: Two instances in different AZs (e.g., `us-east-1a` and `us-east-1b`)
-- **Security Group**: Allows SSH and NFS access for EFS mounting
-
-![Architecture Diagram](EFS.jpg) 
 ---
+![Alt text](EFS.jpg)
+# 📁 Mounting EFS File System to EC2 Instances Across Availability Zones
 
-## Prerequisites
+This project demonstrates how to mount an Amazon Elastic File System (EFS) to two Amazon EC2 instances located in different Availability Zones within the same AWS region. EFS provides a scalable, elastic, cloud-native NFS file system that can be used by multiple EC2 instances simultaneously.
 
-- AWS account with permissions to create EC2, EFS, and security groups
-- Default VPC and subnets across AZs
-- Basic understanding of Linux commands
+## 🗂️ Project Structure
+
+- Two EC2 instances in different Availability Zones (`us-east-1a` and `us-east-1b`)
+- One EFS file system (`MyEFSFilesystem`) shared between both instances
+- EC2 instances configured to mount the EFS on boot using EFS Utils
 
 ---
 
-## Step-by-Step Instructions
+## 🔧 Step-by-Step Setup
 
 ### 1. Create a Security Group for EFS Access
 
-1. Go to the **EC2 Management Console** → **Security Groups**
-2. Create a new security group:
+1. Go to the **EC2 Management Console** > **Security Groups**.
+2. Create a new Security Group:
    - **Name**: `EFS-Access`
-   - **Description**: `Allow access to EFS`
+   - **Description**: Allow access to EFS
    - **VPC**: Default VPC
-3. Add the following **inbound rule**:
-   - Type: `SSH`, Protocol: `TCP`, Port: `22`, Source: `My IP`
-4. Save the security group.
-![Security Group](security-group.png)
+3. Add the following inbound rule:
+   - Type: SSH, Protocol: TCP, Port: 22, Source: Your IP
+4. Save the group.
+![Alt text](security-group.png)
 
-5. Edit the inbound rules again to add:
-   - Type: `NFS`, Protocol: `TCP`, Port: `2049`, Source: `EFS-Access` (self-reference)
-![Security Group](inbondrule.png)
+6. After creation, edit the inbound rules again to add:
+   - Type: NFS, Protocol: TCP, Port: 2049, Source: **The same `EFS-Access` Security Group**
+![Alt text](inbondrule.png)
 ---
 
-### 2. Launch EC2 Instances in Different AZs
+### 2. Launch EC2 Instances in Different Availability Zones
 
-Repeat the steps below for two instances:
+1. Go to **EC2 Dashboard** > **Launch Instance**
+2. Configure the following:
+   - **AMI**: Amazon Linux 2 AMI
+   ![Alt text](ami.png)
+   
+   - **Instance Type**: t2.micro (Free Tier)
+   ![Alt text](instancetype.png)
 
-1. Go to **EC2 Console** → **Launch Instance**
-2. Select:
-   - **Amazon Linux 2 AMI**
-   - **Instance Type**: `t2.micro` (Free Tier)
-3. Click **Edit Networking**:
-   - Choose a subnet from AZ (e.g., `us-east-1a` for first instance, `us-east-1b` for second)
-   - Attach the previously created **EFS-Access** security group
-4. Launch both instances
-
+   - **Subnet**: Choose `us-east-1a` for the first instance
+   - **Security Group**: Select the previously created `EFS-Access`
+     
+   ![Alt text](networksetting.png)
+   
+3. Repeat the above steps for the second instance and choose `us-east-1b` as the subnet.
+   ![Alt text](ami1.png)
+   ![Alt text](instancetype1.png)
+   ![Alt text](networksetting1.png)
 ---
 
-### 3. Create the EFS File System
+### 3. Create an EFS File System
 
-1. Navigate to the **EFS Console** → **Create File System**
+1. Go to the **EFS Console** > **Create File System**
 2. Name the file system: `MyEFSFilesystem`
-3. Choose **Customize** and uncheck:
-   - `Enable automatic backups`
-4. Leave the rest of the settings as default and create the file system
 
+![Alt text](create-efs.png)
+
+4. Choose "Customize" and uncheck **Enable automatic backups**
+![Alt text](uncheck-autobackup.png)
+   
+6. Leave the rest of the settings as default and complete the creation.
+![Alt text](performance.png)
+![Alt text](networkaccess.png)
 ---
 
-### 4. Mount EFS on EC2 Instances
+### 4. Mount the EFS on EC2 Instances
 
-#### Connect to Each EC2 Instance
+#### 4.1 Connect to EC2 Instances
 
-1. Use **EC2 Instance Connect** or SSH
-2. Run the following commands on **both EC2s**:
+Use **EC2 Instance Connect** or SSH to connect to both instances.
+![Alt text](ec2-connect.png)
+![Alt text](ec2-connect1.png)
+
+#### 4.2 Update ,Create a Mount Directory and Install EFS Utils
+
+Run the following commands on **both instances**:
 
 ```bash
-# Update system packages
 sudo yum -y update
-
-# Create mount point
 mkdir ~/efs-mount-point
-
-# Install EFS utilities
 sudo yum install -y amazon-efs-utils
 ```
+![Alt text](Efsutil1.png)
+![Alt text](Efsutil2.png)
+![Alt text](Efsutil3.png)
+![Alt text](Efsutil4.png)
 
-#### Mount the EFS File System
 
-1. Go to **EFS Console** → **Attach**
-2. Copy the EFS mount command using EFS mount helper (e.g.):
+#### 4.3 Mount the EFS
+
+1. Go to the **EFS Console**, select your file system, and click **Attach**.
+2. Copy the mount command (EFS Mount Helper option), e.g.:
 
 ```bash
-sudo mount -t efs -o tls fs-xxxxxxx:/ ~/efs-mount-point
+sudo mount -t efs fs-xxxxxx:/ ~/efs-mount-point
 ```
 
-3. Paste and run the command on both EC2s.
-
+3. Run this command on both instances.
+   
+![Alt text](mounted.png)
+![Alt text](mounted1.png)
 ---
 
-### 5. Test Shared File Access
+## ✅ Test the Shared File System
 
-On one EC2:
+1. On the **first EC2 instance**, create a test directory and file:
 
 ```bash
 cd ~/efs-mount-point
 mkdir testdirectory
 touch testdirectory/testfile.txt
 ```
+![Alt text](creatdir-file.png)
 
-On the second EC2:
+2. On the **second EC2 instance**, check the shared file:
 
 ```bash
 cd ~/efs-mount-point
-ls testdirectory
-# You should see: testfile.txt
+ls 
 ```
+![Alt text](Testing1.png)
+![Alt text](Testing2.png)
+![Alt text](Testing3.png)
+
+If you can see the directory and file, the EFS mount is successfully shared across both instances.
 
 ---
 
-## Conclusion
+## 📌 Notes
 
-This setup successfully demonstrates mounting a shared EFS file system to EC2 instances across multiple Availability Zones for high availability and scalability.
+- This setup allows a shared file system between EC2 instances across multiple Availability Zones.
+- EFS provides scalable storage and is ideal for applications needing shared access to data.
+- Be sure to unmount and clean up resources to avoid unexpected charges if this was for testing purposes.
 
 ---
