@@ -8,7 +8,7 @@ This project demonstrates how to mount an Amazon Elastic File System (EFS) to tw
 - **EC2 Instances**: Two instances in different AZs (e.g., `us-east-1a` and `us-east-1b`)
 - **Security Group**: Allows SSH and NFS access for EFS mounting
 
-![Architecture Diagram](<your-diagram-link>) <!-- Replace with actual link -->
+![Architecture Diagram](<your-diagram-link>) 
 
 ---
 
