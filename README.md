@@ -99,11 +99,11 @@ sudo yum install -y amazon-efs-utils
 ```
 ![Alt text](Efsutil1.png)
 
-![Alt text](Efsutil2.png)
+![Alt text](EFSutil2.png)
 
-![Alt text](Efsutil3.png)
+![Alt text](EFSutil3.png)
 
-![Alt text](Efsutil4.png)
+![Alt text](EFSutil4.png)
 
 
 #### 4.3 Mount the EFS
