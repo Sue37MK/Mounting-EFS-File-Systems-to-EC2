@@ -1,3 +1,8 @@
+Great job on completing that project! Here's a professional and well-structured `README.md` file for your EFS-to-EC2 mounting project based on the steps and diagram/scripts you provided:
+
+---
+
+```markdown
 # Mounting EFS File Systems to EC2 Instances Across Availability Zones
 
 This project demonstrates how to mount an Amazon Elastic File System (EFS) to two EC2 instances located in different Availability Zones (AZs) within the same region. It ensures shared file access between the EC2 instances using EFS.
@@ -8,8 +13,7 @@ This project demonstrates how to mount an Amazon Elastic File System (EFS) to tw
 - **EC2 Instances**: Two instances in different AZs (e.g., `us-east-1a` and `us-east-1b`)
 - **Security Group**: Allows SSH and NFS access for EFS mounting
 
-![Architecture Diagram](<your-diagram-link>) 
-
+![Architecture Diagram](EFS.jpg) 
 ---
 
 ## Prerequisites
@@ -32,9 +36,11 @@ This project demonstrates how to mount an Amazon Elastic File System (EFS) to tw
 3. Add the following **inbound rule**:
    - Type: `SSH`, Protocol: `TCP`, Port: `22`, Source: `My IP`
 4. Save the security group.
+![Security Group](security-group.png)
+
 5. Edit the inbound rules again to add:
    - Type: `NFS`, Protocol: `TCP`, Port: `2049`, Source: `EFS-Access` (self-reference)
-
+![Security Group](inbondrule.png)
 ---
 
 ### 2. Launch EC2 Instances in Different AZs
@@ -78,4 +84,43 @@ mkdir ~/efs-mount-point
 
 # Install EFS utilities
 sudo yum install -y amazon-efs-utils
+```
 
+#### Mount the EFS File System
+
+1. Go to **EFS Console** → **Attach**
+2. Copy the EFS mount command using EFS mount helper (e.g.):
+
+```bash
+sudo mount -t efs -o tls fs-xxxxxxx:/ ~/efs-mount-point
+```
+
+3. Paste and run the command on both EC2s.
+
+---
+
+### 5. Test Shared File Access
+
+On one EC2:
+
+```bash
+cd ~/efs-mount-point
+mkdir testdirectory
+touch testdirectory/testfile.txt
+```
+
+On the second EC2:
+
+```bash
+cd ~/efs-mount-point
+ls testdirectory
+# You should see: testfile.txt
+```
+
+---
+
+## Conclusion
+
+This setup successfully demonstrates mounting a shared EFS file system to EC2 instances across multiple Availability Zones for high availability and scalability.
+
+---
