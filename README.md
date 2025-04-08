@@ -1,5 +1,6 @@
 ---
 ![Alt text](EFS.jpg)
+
 # 📁 Mounting EFS File System to EC2 Instances Across Availability Zones
 
 This project demonstrates how to mount an Amazon Elastic File System (EFS) to two Amazon EC2 instances located in different Availability Zones within the same AWS region. EFS provides a scalable, elastic, cloud-native NFS file system that can be used by multiple EC2 instances simultaneously.
@@ -24,6 +25,7 @@ This project demonstrates how to mount an Amazon Elastic File System (EFS) to tw
 3. Add the following inbound rule:
    - Type: SSH, Protocol: TCP, Port: 22, Source: Your IP
 4. Save the group.
+   
 ![Alt text](security-group.png)
 
 6. After creation, edit the inbound rules again to add:
@@ -36,9 +38,11 @@ This project demonstrates how to mount an Amazon Elastic File System (EFS) to tw
 1. Go to **EC2 Dashboard** > **Launch Instance**
 2. Configure the following:
    - **AMI**: Amazon Linux 2 AMI
+     
    ![Alt text](ami.png)
    
    - **Instance Type**: t2.micro (Free Tier)
+     
    ![Alt text](instancetype.png)
 
    - **Subnet**: Choose `us-east-1a` for the first instance
@@ -47,9 +51,13 @@ This project demonstrates how to mount an Amazon Elastic File System (EFS) to tw
    ![Alt text](networksetting.png)
    
 3. Repeat the above steps for the second instance and choose `us-east-1b` as the subnet.
+   
    ![Alt text](ami1.png)
+   
    ![Alt text](instancetype1.png)
+   
    ![Alt text](networksetting1.png)
+   
 ---
 
 ### 3. Create an EFS File System
@@ -60,10 +68,13 @@ This project demonstrates how to mount an Amazon Elastic File System (EFS) to tw
 ![Alt text](create-efs.png)
 
 4. Choose "Customize" and uncheck **Enable automatic backups**
+   
 ![Alt text](uncheck-autobackup.png)
    
 6. Leave the rest of the settings as default and complete the creation.
+   
 ![Alt text](performance.png)
+
 ![Alt text](networkaccess.png)
 ---
 
@@ -72,7 +83,9 @@ This project demonstrates how to mount an Amazon Elastic File System (EFS) to tw
 #### 4.1 Connect to EC2 Instances
 
 Use **EC2 Instance Connect** or SSH to connect to both instances.
+
 ![Alt text](ec2-connect.png)
+
 ![Alt text](ec2-connect1.png)
 
 #### 4.2 Update ,Create a Mount Directory and Install EFS Utils
@@ -85,8 +98,11 @@ mkdir ~/efs-mount-point
 sudo yum install -y amazon-efs-utils
 ```
 ![Alt text](Efsutil1.png)
+
 ![Alt text](Efsutil2.png)
+
 ![Alt text](Efsutil3.png)
+
 ![Alt text](Efsutil4.png)
 
 
@@ -102,7 +118,9 @@ sudo mount -t efs fs-xxxxxx:/ ~/efs-mount-point
 3. Run this command on both instances.
    
 ![Alt text](mounted.png)
+
 ![Alt text](mounted1.png)
+
 ---
 
 ## ✅ Test the Shared File System
@@ -123,7 +141,9 @@ cd ~/efs-mount-point
 ls 
 ```
 ![Alt text](Testing1.png)
+
 ![Alt text](Testing2.png)
+
 ![Alt text](Testing3.png)
 
 If you can see the directory and file, the EFS mount is successfully shared across both instances.
