@@ -1,6 +1,3 @@
-Great job on completing that project! Here's a professional and well-structured `README.md` file for your EFS-to-EC2 mounting project based on the steps and diagram/scripts you provided:
-
----
 
 ```markdown
 # Mounting EFS File Systems to EC2 Instances Across Availability Zones
